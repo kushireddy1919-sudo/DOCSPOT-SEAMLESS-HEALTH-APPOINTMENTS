@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocSpot - AP & TS Hospital Network</title>
+    <style>
+        :root { 
+            --hosp-blue: #0056b3; 
+            --hosp-dark: #003366; 
+            --success-green: #28a745;
+            --glass-white: rgba(255, 255, 255, 0.96);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+
+        body { 
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
+                        url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1350&q=80');
+            background-size: cover; background-position: center; background-attachment: fixed;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+        }
+
+        .container { 
+            background: var(--glass-white); width: 95%; max-width: 800px; 
+            border-radius: 15px; padding: 40px; box-shadow: 0 15px 40px rgba(0,0,0,0.4); text-align: center;
+        }
+
+        .page { display: none; }
+        .active { display: block; animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
+
+        h1, h2 { color: var(--hosp-dark); margin-bottom: 20px; text-transform: uppercase; }
+
+        .role-container { display: flex; gap: 20px; margin-top: 30px; }
+        .role-card { 
+            flex: 1; padding: 30px; border: 2px solid #ddd; border-radius: 12px; 
+            cursor: pointer; transition: 0.3s; position: relative; background: #fff;
+        }
+        .role-card:hover { border-color: var(--hosp-blue); transform: translateY(-5px); }
+        .notif-dot { position: absolute; top: -10px; right: -10px; background: red; color: white; border-radius: 50%; padding: 5px 12px; font-size: 12px; display: none; font-weight: bold; }
+
+        .hand-drawn-table { width: 100%; border-collapse: collapse; margin-top: 20px; border: 2px solid #333; }
+        .hand-drawn-table td { border: 1px solid #333; padding: 15px; text-align: left; }
+        .field-label { background: #f4f4f4; font-weight: bold; width: 35%; }
+
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; }
+
+        .btn { background: var(--hosp-blue); color: white; border: none; padding: 15px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%; margin-top: 20px; }
+        .btn:hover { background: var(--hosp-dark); }
+
+        /* Thank You Page Overlay */
+        #pageThankYou {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; z-index: 2000;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            padding: 40px; text-align: center;
+        }
+        .slogan { font-style: italic; color: var(--success-green); font-size: 1.8rem; margin: 30px 0; font-weight: bold; line-height: 1.4; }
+
+        .hosp-box { border: 1px solid #ddd; padding: 18px; margin-bottom: 12px; border-radius: 10px; text-align: left; cursor: pointer; background: white; transition: 0.2s; }
+        .hosp-box:hover { background: #f0f7ff; border-color: var(--hosp-blue); transform: translateX(5px); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="pageWelcome" class="page active">
+            <h1 style="font-size: 2.8rem;">🏥 DocSpot</h1>
+            <p style="color: #666; margin-bottom: 20px;">Your Trusted Health Partner in AP & TS</p>
+            <button class="btn" onclick="showPage('pageRoles')">Get Started</button>
+        </div>
+
+        <div id="pageRoles" class="page">
+            <h2>Portal Access</h2>
+            <div class="role-container">
+                <div class="role-card" onclick="handlePatientClick()">
+                    <div id="pNotif" class="notif-dot">!</div>
+                    <div style="font-size: 50px;">🤒</div>
+                    <h3>Patient</h3>
+                </div>
+                <div class="role-card" onclick="openDoctorDashboard()">
+                    <div id="dNotif" class="notif-dot">1</div>
+                    <div style="font-size: 50px;">👨‍⚕️</div>
+                    <h3>Doctor</h3>
+                </div>
+            </div>
+        </div>
+
+        <div id="pagePatientForm1" class="page">
+            <h2>Patient Registration</h2>
+            <table class="hand-drawn-table">
+                <tr><td class="field-label">Full Name</td><td><input type="text" id="pName"></td></tr>
+
+                <tr><td class="field-label">City / Area</td><td><input type="text" id="pAddress" placeholder="e.g. Vizag, Hyderabad, Vijayawada"></td></tr>
+                <tr>
+                    <td class="label-cell">Patient Name</td>
+                    <td><input type="text" id="pName" placeholder="Full Name"></td>
+                </tr>
+                <tr>
+                    <td class="label-cell">Phone Number</td>
+                    <td><input type="tel" id="pPhone" placeholder="10-digit number"></td>
+                </tr>
+                <tr>
+                    <td class="label-cell">Age</td>
+                    <td><input type="number" id="pAge"></td>
+                </tr>
+                <tr>
+                    <td class="label-cell">Address</td>
+                    <td><input type="text" id="pAddress" placeholder="e.g., Madhapur"></td>
+                </tr>
+                <tr>
+                    <td class="label-cell">Gender</td>
+                    <td><select id="pGender"><option>Male</option><option>Female</option></select></td>
+                </tr>
+
+                <tr><td class="field-label">Health Issue</td><td>
+                    <select id="pConcern">
+                        <option value="Cardiology">Heart Issue</option>
+                            <option value="Dermatology">Skin Rash</option>
+                            <option value="Neurology">Brain/Nerve Issue</option>
+                            <option value="General Physician">General Fever</option>
+                            <option value="Dentist">Teeth</option>
+                            <option value="Ophthalmologist">Eye</option>
+                            <option value="Nephrologist">Kidney</option>
+                            <option value="Gastroenterologist">General Fever</option>
+                            <option value="Otolaryngologis">ENT</option>
+                            <option value="Gastroenterologist">General Fever</option>
+                            <option value="Orthopaedic">Bone</option>
+                    </select>
+                </td></tr>
+            </table>
+            <button class="btn" onclick="showPage('pagePatientForm2')">Continue</button>
+        </div>
+
+        <div id="pagePatientForm2" class="page">
+            <h2>Confirm Schedule</h2>
+            <table class="hand-drawn-table">
+                <tr><td class="field-label">Patient</td><td id="dispName">--</td></tr>
+                <tr><td class="field-label">Date</td><td><input type="date" id="appDate" onchange="autoDay()"></td></tr>
+                <tr><td class="field-label">Day</td><td><input type="text" id="appDay" readonly></td></tr>
+            </table>
+            <button class="btn" onclick="findHospitals()">View Hospitals</button>
+        </div>
+
+        <div id="pageHospitals" class="page">
+            <h2>Available Hospitals in <span id="targetArea" style="color: var(--hosp-blue);">--</span></h2>
+            <div id="hospitalList" style="margin-top: 20px;"></div>
+            <button class="btn" style="background:#6c757d;" onclick="showPage('pagePatientForm1')">Back to Edit</button>
+        </div>
+
+        <div id="pageDoctor" class="page">
+            <h2>Doctor Dashboard</h2>
+            <div id="doctorInbox" style="display:none; background:#f0f7ff; padding:25px; border-radius:10px; text-align:left; border-left: 8px solid var(--hosp-blue);">
+                <p><strong>Patient:</strong> <span id="reqName"></span></p>
+                <p><strong>Location:</strong> <span id="reqArea"></span></p>
+                <p><strong>Hospital Selected:</strong> <span id="reqHosp"></span></p>
+                <button class="btn" style="background:var(--success-green);" onclick="doctorAction('Confirmed')">Confirm & Approve</button>
+            </div>
+            <p id="noReq" style="margin-top: 20px; color: #888;">No pending requests at the moment.</p>
+            <button class="btn" style="background:#6c757d;" onclick="showPage('pageRoles')">Exit Portal</button>
+        </div>
+    </div>
+
+    <div id="pageThankYou">
+        <div style="font-size: 100px; animation: bounce 1s infinite;">🏥</div>
+        <h1 style="font-size: 3.5rem; color: var(--hosp-dark);">Thank You!</h1>
+        <p style="font-size: 1.3rem; color: #444;">Your appointment is locked and confirmed.</p>
+        <div class="slogan">"Health is the greatest gift,<br>contentment the greatest wealth."</div>
+        <button class="btn" onclick="goHome()" style="max-width: 320px;">Back to Home Screen</button>
+    </div>
+
+    <script>
+        let sessionData = {};
+        let isConfirmed = false;
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            if(pageId === 'pagePatientForm2') {
+                document.getElementById('dispName').innerText = document.getElementById('pName').value || 'Patient';
+            }
+        }
+
+        function autoDay() {
+            const date = new Date(document.getElementById('appDate').value);
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            document.getElementById('appDay').value = days[date.getDay()];
+        }
+
+        function findHospitals() {
+            const area = document.getElementById('pAddress').value;
+            const list = document.getElementById('hospitalList');
+            const areaDisplay = document.getElementById('targetArea');
+            areaDisplay.innerText = area;
+            list.innerHTML = '';
+
+            let hospitals = [];
+            const lowArea = area.toLowerCase();
+
+            // AP & TS State-wise Logic (Min 5 hospitals per major area)
+            if (lowArea.includes("hyderabad")) {
+                hospitals = [
+                    {name: "Apollo Hospitals, Jubilee Hills"},
+                    {name: "Yashoda Hospitals, Somajiguda"},
+                    {name: "Care Hospitals, Banjara Hills"},
+                    {name: "NIMS, Punjagutta"},
+                    {name: "Medicover Hospitals, Hitech City"}
+                ];
+            } else if (lowArea.includes("vizag") || lowArea.includes("visakhapatnam")) {
+                hospitals = [
+                    {name: "Seven Hills Hospital"},
+                    {name: "KIMS-Icon Hospital"},
+                    {name: "Apollo Hospitals, Arilova"},
+                    {name: "Care Hospitals, Waltair"},
+                    {name: "MGH Vizag"}
+                ];
+            } else if (lowArea.includes("vijayawada")) {
+                hospitals = [
+                    {name: "Manipal Hospital"},
+                    {name: "Ayush Hospitals"},
+                    {name: "Ramesh Hospitals"},
+                    {name: "Andhra Hospitals"},
+                    {name: "Rainbow Children's Hospital"}
+                ];
+            } else if (lowArea.includes("tirupati")) {
+                hospitals = [
+                    {name: "SVRR Government Hospital"},
+                    {name: "Sankara Netralaya"},
+                    {name: "Amara Hospital"},
+                    {name: "Apollo Clinic"},
+                    {name: "Lotus Hospital"}
+                ];
+            } else if (lowArea.includes("warangal")) {
+                hospitals = [
+                    {name: "MGM Hospital"},
+                    {name: "St. Ann's Hospital"},
+                    {name: "Maxcare Hospital"},
+                    {name: "Ajara Hospital"},
+                    {name: "Rohini Hospital"}
+                ];
+            } else {
+                // Fallback for any other area in AP/TS
+                hospitals = [
+                    {name: area + " Government General Hospital"},
+                    {name: area + " Multi-Specialty Clinic"},
+                    {name: "Suraksha Hospital, " + area},
+                    {name: "LifeLine Medical Center"},
+                    {name: "People's Choice Hospital"}
+                ];
+            }
+
+            hospitals.forEach(h => {
+                const div = document.createElement('div');
+                div.className = 'hosp-box';
+                div.innerHTML = `<strong>${h.name}</strong><br><small>Verified Facility • Open 24/7</small>`;
+                div.onclick = () => {
+                    sessionData = { name: document.getElementById('pName').value, hospital: h.name, area: area };
+                    document.getElementById('dNotif').style.display = 'block';
+                    document.getElementById('reqName').innerText = sessionData.name;
+                    document.getElementById('reqArea').innerText = sessionData.area;
+                    document.getElementById('reqHosp').innerText = sessionData.hospital;
+                    document.getElementById('doctorInbox').style.display = 'block';
+                    document.getElementById('noReq').style.display = 'none';
+                    alert("Sending your request to " + h.name + "..."); 
+                    showPage('pageRoles');
+                };
+                list.appendChild(div);
+            });
+            showPage('pageHospitals');
+        }
+
+        function openDoctorDashboard() {
+            document.getElementById('dNotif').style.display = 'none';
+            showPage('pageDoctor');
+        }
+
+        function doctorAction(status) {
+            isConfirmed = true;
+            alert("Success! Patient notified about confirmation.");
+            document.getElementById('doctorInbox').style.display = 'none';
+            document.getElementById('noReq').style.display = 'block';
+            document.getElementById('pNotif').style.display = 'block';
+            showPage('pageRoles');
+        }
+
+        function handlePatientClick() {
+            if (isConfirmed && document.getElementById('pNotif').style.display === 'block') {
+                document.getElementById('pNotif').style.display = 'none';
+                document.getElementById('pageThankYou').style.display = 'flex';
+            } else {
+                showPage('pagePatientForm1');
+            }
+        }
+
+        function goHome() {
+            document.getElementById('pageThankYou').style.display = 'none';
+            isConfirmed = false;
+            showPage('pageWelcome');
+        }
+    </script>
+</body>
+</html>
